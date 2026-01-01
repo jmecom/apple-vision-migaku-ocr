@@ -87,7 +87,11 @@ def ocr_file_to_text(img_path: str, cfg: OCRConfig) -> str:
 
 
 def copy_to_clipboard(text: str) -> None:
-    subprocess.run(["pbcopy"], input=text.encode("utf-8"), check=True)
+    """Copy text to clipboard using NSPasteboard (triggers proper change notifications)."""
+    from AppKit import NSPasteboard, NSPasteboardTypeString
+    pb = NSPasteboard.generalPasteboard()
+    pb.clearContents()
+    pb.setString_forType_(text, NSPasteboardTypeString)
 
 
 def main() -> int:

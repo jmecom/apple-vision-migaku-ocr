@@ -3,9 +3,7 @@ import argparse
 import os
 import queue
 import subprocess
-import sys
 import tempfile
-import threading
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -46,7 +44,7 @@ def screencapture_window(window_id: int, out_png: str) -> None:
     subprocess.run(["screencapture", "-l", str(window_id), "-o", "-x", "-t", "png", out_png], check=True)
 
 
-def run_once(app: str, title: Optional[str], cfg: OCRConfig, after_cmd: Optional[str]) -> None:
+def run_once(app: str, title: Optional[str], cfg: OCRConfig) -> None:
     t0 = time.perf_counter()
 
     wid = pick_window_id(app, title)
@@ -73,10 +71,6 @@ def run_once(app: str, title: Optional[str], cfg: OCRConfig, after_cmd: Optional
 
     copy_to_clipboard(text)
 
-    if after_cmd:
-        # naive split is fine if you keep it simple; replace with shlex if you want quoting
-        subprocess.Popen(after_cmd.split(" "))
-
     print(
         f"[daemon] ok | pick:{(t1-t0)*1000:.0f}ms cap:{(t2-t1)*1000:.0f}ms "
         f"ocr:{(t3-t2)*1000:.0f}ms total:{(t3-t0)*1000:.0f}ms | {len(text)} chars",
@@ -96,8 +90,6 @@ def main() -> int:
     ap.add_argument("--extra-lang", action="append", default=[])
     ap.add_argument("--crop", help="Normalized crop x0,y0,x1,y1")
     ap.add_argument("--no-cleanup", action="store_true")
-
-    ap.add_argument("--after", help="Optional command to run after copying text")
 
     args = ap.parse_args()
 
@@ -128,7 +120,7 @@ def main() -> int:
     try:
         while True:
             work_queue.get()  # Block until hotkey fires
-            run_once(args.app, args.title, cfg, args.after)
+            run_once(args.app, args.title, cfg)
     except KeyboardInterrupt:
         pass
     finally:
