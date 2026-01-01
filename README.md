@@ -1,6 +1,6 @@
-# Migaku + DuckStation OCR Pipeline (macOS)
+# apple-vision-migaku-ocr
 
-OCR pipeline for Japanese game learning: capture DuckStation window → OCR → clipboard → Migaku.
+OCR pipeline for working with emulators like DuckStation: capture DuckStation window → OCR → clipboard → Migaku.
 
 ## Setup
 
