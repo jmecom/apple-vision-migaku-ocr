@@ -1,0 +1,4 @@
+ocrmac
+pillow
+pynput
+pyobjc-framework-Quartz
